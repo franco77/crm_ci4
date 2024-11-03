@@ -9,33 +9,30 @@ class WalletsModel extends Model{
    protected $searchFields = ['user_id', 'amount', 'remaining_amount', 'deposit_date', 'payment_method'];
 
    public function filter($search = null, $limit = null, $start = null, $orderField = null, $orderDir = null)
-{
-   $builder = $this->table($this->table);
+   {
+      $builder = $this->table($this->table);
 
-   // Validar que $limit y $start sean enteros
-   $limit = is_numeric($limit) ? (int)$limit : 10;  // Por defecto, limit = 10
-   $start = is_numeric($start) ? (int)$start : 0;   // Por defecto, start = 0
+      // Validar que $limit y $start sean enteros
+      $limit = is_numeric($limit) ? (int)$limit : 10;  // Por defecto, limit = 10
+      $start = is_numeric($start) ? (int)$start : 0;   // Por defecto, start = 0
 
-   // Asegurarse de que $orderField y $orderDir no estén vacíos y sean válidos
-   $orderField = in_array($orderField, $this->allowedFields) ? $orderField : 'id';
-   $orderDir = in_array(strtolower($orderDir), ['asc', 'desc']) ? $orderDir : 'asc';
+      // Asegurarse de que $orderField y $orderDir no estén vacíos y sean válidos
+      $orderField = in_array($orderField, $this->allowedFields) ? $orderField : 'amount';
+      $orderDir = in_array(strtolower($orderDir), ['asc', 'desc']) ? $orderDir : 'asc';
 
-   // Aplicar filtro de búsqueda
-   if ($search) {
-      $builder->groupStart();
-      foreach ($this->searchFields as $i => $column) {
-         if ($i === 0) {
-            $builder->like($column, $search);
-         } else {
-            $builder->orLike($column, $search);
+      // Aplicar filtro de búsqueda
+      if ($search) {
+         $builder->groupStart();
+         foreach ($this->searchFields as $i => $column) {
+            if ($i === 0) {
+               $builder->like($column, $search);
+            } else {
+               $builder->orLike($column, $search);
+            }
          }
+         $builder->groupEnd();
       }
-      $builder->groupEnd();
-   }
 
-
-
-      // Muestra datos menores o iguales a las primeras 6 columnas.
 	  
       $builder->select('id, user_id, amount, remaining_amount, deposit_date, payment_method')
               ->orderBy($orderField, $orderDir)
@@ -44,8 +41,7 @@ class WalletsModel extends Model{
       $query = $builder->get()->getResultArray();
 
       foreach ($query as $index => $value) {
-         $query[$index]['notes'] = strlen($query[$index]['notes']) > 50 ? substr($query[$index]['notes'], 0, 50).'...' : $query[$index]['notes'];
-         
+                  
          $query[$index]['column_bulk'] = '<input type="checkbox" class="bulk-item" value="'.$query[$index][$this->primaryKey].'">';
          $query[$index]['column_action'] = '<button class="btn btn-sm btn-xs btn-success form-action" item-id="'.$query[$index][$this->primaryKey].'" purpose="detail"><i class="far fa-eye"></i></button> <button class="btn btn-sm btn-xs btn-warning form-action" purpose="edit" item-id="'.$query[$index][$this->primaryKey].'"><i class="far fa-edit"></i></button>';
       }

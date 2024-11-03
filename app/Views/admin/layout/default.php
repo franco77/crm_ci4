@@ -44,7 +44,7 @@
                         <nav>
                             <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item"><a href="#">Pages</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Esto es un Test:
+                                <li class="breadcrumb-item active" aria-current="page">
                                     <?= service('settings')->get('App.siteName'); ?></li>
                             </ol>
                         </nav>

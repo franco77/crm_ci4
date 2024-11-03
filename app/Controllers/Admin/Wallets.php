@@ -4,12 +4,14 @@ namespace App\Controllers\Admin;
 use App\Controllers\Admin\BaseController;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\WalletsModel;
+use IonAuth\Libraries\IonAuth;
 class Wallets extends BaseController{
    use ResponseTrait;
+   protected $ionAuth;
 
    public function __construct() {
       $this->WalletsModel = new WalletsModel;
-
+      $this->ionAuth = new IonAuth();
    }
 
    function index(){
@@ -55,60 +57,76 @@ class Wallets extends BaseController{
 
    public function new()
    {
-      $data = [];
+      $users = $this->ionAuth->users()->result();
+      $data = ['data_customer' => $users,];
 
       echo view('admin/wallets/form', $data);
    }
 
-   public function create()
+   public function create() 
    {
-       $request = [ 
-		  'user_id' => $this->request->getPost('user_id'), 
-		  'amount' => $this->request->getPost('amount'), 
-		  'remaining_amount' => $this->request->getPost('remaining_amount'), 
-		  'deposit_date' => $this->request->getPost('deposit_date'), 
-		  'payment_method' => $this->request->getPost('payment_method'), 
-		  'reference' => $this->request->getPost('reference'), 
-		  'support' => $this->request->getPost('support'), 
-		  'notes' => $this->request->getPost('notes'), 
-		  'status' => $this->request->getPost('status'), 
-		  'created_at' => $this->request->getPost('created_at'), 
-		  'updated_at' => $this->request->getPost('updated_at'), 
-	 ];
-      $this->rules();
+      $this->validation->setRules([
+         'support' => [
+            'rules' => 'uploaded[support]|ext_in[support,jpg,jpeg,png,pdf]|max_size[support,2048]',
+            'errors' => [
+               'uploaded' => 'Debe seleccionar un archivo de soporte.',
+               'ext_in' => 'El archivo debe ser una imagen (jpg, jpeg, png) o un PDF.',
+               'max_size' => 'El archivo de soporte no debe superar los 2MB.',
+            ],
+         ],
+      ]);
+   
+       // Recoger los datos del formulario
+       $request = [
+           'user_id' => $this->request->getPost('user_id'),
+           'amount' => $this->request->getPost('amount'),
+           'remaining_amount' => $this->request->getPost('remaining_amount'),
+           'deposit_date' => $this->request->getPost('deposit_date'),
+           'payment_method' => $this->request->getPost('payment_method'),
+           'reference' => $this->request->getPost('reference'),
+           'notes' => $this->request->getPost('notes'),
+           'status' => $this->request->getPost('status'),
+           'created_at' => date('Y-m-d H:i:s'),
+       ];
+   
+       // Verificar si el archivo es válido y moverlo al directorio especificado
+        // Subir archivo
+        $support = $this->request->getFile('support');
 
-      if ($this->validation->run($request) != TRUE) {
-         return $this->respond([
-            'status' => 400,
-            'error' => 400,
-            'messages' => $this->validation->getErrors()
-         ], 400);
-
-      } else {
-         try
-         {
-            $insert = $this->WalletsModel->insert($request);
-
-            if ($insert)
-            {
+        if ($support && $support->isValid() && !$support->hasMoved()) {
+           // Generar un nombre único para evitar conflictos
+           $newName = $support->getRandomName();
+  
+           // Mover el archivo a la carpeta 'public/uploads/supports'
+           $support->move(FCPATH . 'uploads/supports', $newName);
+  
+           // Guardar la ruta del archivo subido en la base de datos
+           $request['support'] = $newName;
+        } else {
+           return $this->respond([
+              'status' => 400,
+              'error' => 400,
+              'messages' => 'El archivo de soporte no es válido o no se pudo subir.'
+           ], 400);
+        }
+       // Intentar insertar los datos en la base de datos
+       try {
+           $insert = $this->WalletsModel->insert($request);
+   
+           if ($insert) {
                return $this->respondCreated([
-                  'status' => 201,
-                  'message' => 'Data created.'
+                   'status' => 201,
+                   'message' => 'Datos creados correctamente.',
                ]);
-            }
-            else
-            {
+           } else {
                return $this->fail($this->WalletsModel->errors());
-            }
-         }
-         catch (\Exception $e)
-         {
-            // return $this->failServerError($e->getMessage());
-            return $this->failServerError('Sorry, an error occurred. Please contact the administrator.');
-         }
-      }
-
+           }
+       } catch (\Exception $e) {
+           return $this->failServerError('Lo sentimos, ocurrió un error. Por favor, contacte al administrador.');
+       }
    }
+   
+   
 
    public function show($id = null)
    {
@@ -280,14 +298,6 @@ class Wallets extends BaseController{
          'status' => [
             'label' => 'Status',
             'rules' => 'required|in_list[active, inactive, debited, favor]'
-         ],
-         'created_at' => [
-            'label' => 'Created At',
-            'rules' => 'required|valid_date[Y-m-d H:i]'
-         ],
-         'updated_at' => [
-            'label' => 'Updated At',
-            'rules' => 'required|valid_date[Y-m-d H:i]'
          ],
       ]);
    }
