@@ -18,11 +18,11 @@
                     <thead>
                         <tr>
                             <th style="width: 0px"><input type="checkbox" class="check-items"></th>
-                            <th>User Id</th>
-                            <th>Amount</th>
-                            <th>Remaining Amount</th>
-                            <th>Deposit Date</th>
-                            <th>Payment Method</th>
+                            <th>Cliente</th>
+                            <th>Monto</th>
+                            <th>Cantidad restante</th>
+                            <th>Fecha de depósito</th>
+                            <th>Soporte</th>
                             <th style="width: 0px">#</th>
                         </tr>
                     </thead>
@@ -88,7 +88,7 @@ $(document).ready(function() {
                 "data": "deposit_date"
             },
             {
-                "data": "payment_method"
+                "data": "support"
             },
             {
                 "data": "column_action",

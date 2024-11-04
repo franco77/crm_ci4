@@ -142,15 +142,15 @@ class Employees extends BaseController
          if ($data) {
 
             $table = '<table class="table table-striped table-bordered table-sm">';
-            $table .= '<tr><th>' . lang('app.employees.ic') . '</th><td>' . $data['ic'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.employees.position') . '</th><td>' . $data['position_title'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.employees.full_name') . '</th><td>' . $data['first_name'] . ' ' . $data['last_name'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.employees.hire_date') . '</th><td>' . $data['hire_date'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.employees.salary') . '</th><td>' . $data['salary'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.employees.email') . '</th><td>' . $data['email'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.employees.phone_number') . '</th><td>' . $data['phone_number'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.employees.created_at') . '</th><td>' . $data['created_at'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.employees.updated_at') . '</th><td>' . $data['updated_at'] . '</td></tr>';
+            $table .= '<tr><th>Cédula</th><td>' . $data['ic'] . '</td></tr>';
+            $table .= '<tr><th>Cargo</th><td>' . $data['position_title'] . '</td></tr>';
+            $table .= '<tr><th>Nombre</th><td>' . $data['first_name'] . ' ' . $data['last_name'] . '</td></tr>';
+            $table .= '<tr><th>Fecha Ingreso</th><td>' . $data['hire_date'] . '</td></tr>';
+            $table .= '<tr><th>Salario</th><td>' . $data['salary'] . '</td></tr>';
+            $table .= '<tr><th>Email</th><td>' . $data['email'] . '</td></tr>';
+            $table .= '<tr><th>Teléfono</th><td>' . $data['phone_number'] . '</td></tr>';
+            $table .= '<tr><th>Registrado El</th><td>' . $data['created_at'] . '</td></tr>';
+            $table .= '<tr><th>Actualiza El</th><td>' . $data['updated_at'] . '</td></tr>';
             $table .= '</table>';
             return $this->respond($table);;
          } else {

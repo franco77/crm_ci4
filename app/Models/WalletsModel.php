@@ -34,16 +34,36 @@ class WalletsModel extends Model{
       }
 
 	  
-      $builder->select('id, user_id, amount, remaining_amount, deposit_date, payment_method')
-              ->orderBy($orderField, $orderDir)
-              ->limit($limit, $start);
+      $builder->select('
+    wallets.id,
+    wallets.user_id,
+    wallets.amount,
+    wallets.remaining_amount,
+    wallets.deposit_date,
+    wallets.payment_method,
+    wallets.support,
+    users.id AS usId,
+    users.ic,
+    users.first_name,
+    users.last_name
+')
+->join('users', 'users.id = wallets.user_id')  // Cambiado a LEFT JOIN y corregida la condición
+->orderBy($orderField, $orderDir)
+->limit($limit, $start);
 
       $query = $builder->get()->getResultArray();
-
+      $basePath = base_url('admin/wallets/downloadSupport');
       foreach ($query as $index => $value) {
-                  
+         $query[$index]['user_id'] = $query[$index]['first_name'] .' '.$query[$index]['last_name'];  
+         if (!empty($query[$index]['support'])) {
+            // Si hay archivo, generar el enlace de descarga
+            $query[$index]['support'] = '<a href="' . $basePath . '/' . $query[$index][$this->primaryKey] . '" target="_blank"><i class="bi bi-download"></i> Descargar Soporte</a>';
+        } else {
+            // Si no hay archivo, mostrar el mensaje correspondiente
+            $query[$index]['support'] = '<i class="bi bi-slash-circle"></i> No hay soporte';
+        }
          $query[$index]['column_bulk'] = '<input type="checkbox" class="bulk-item" value="'.$query[$index][$this->primaryKey].'">';
-         $query[$index]['column_action'] = '<button class="btn btn-sm btn-xs btn-success form-action" item-id="'.$query[$index][$this->primaryKey].'" purpose="detail"><i class="far fa-eye"></i></button> <button class="btn btn-sm btn-xs btn-warning form-action" purpose="edit" item-id="'.$query[$index][$this->primaryKey].'"><i class="far fa-edit"></i></button>';
+         $query[$index]['column_action'] = '<button class="btn btn-sm btn-xs btn-success form-action" item-id="'.$query[$index][$this->primaryKey].'" purpose="detail"><i class="bi bi-eye"></i></button> <button class="btn btn-sm btn-xs btn-warning form-action" purpose="edit" item-id="'.$query[$index][$this->primaryKey].'"><i class="bi bi-pencil"></i></button>';
       }
       return $query;
    }
@@ -79,5 +99,44 @@ class WalletsModel extends Model{
 
       return $builder->countAllResults();
    }
+
+
+   public function getUserWallets($userId)
+    {
+        return $this->where('user_id', $userId)
+                    ->where('status', 'active')
+                    ->findAll();
+    }
+    
+    public function updateRemainingAmount($walletId, $amount)
+    {
+        $wallet = $this->find($walletId);
+        if (!$wallet) return false;
+        
+        $newRemaining = $wallet['remaining_amount'] - $amount;
+        if ($newRemaining < 0) return false;
+        
+        return $this->update($walletId, ['remaining_amount' => $newRemaining]);
+    }
+
+
+   public function getSumRemainingAmountByUser()
+{
+    $builder = $this->db->table('wallets');
+    $builder->select('
+        wallets.user_id,
+        SUM(wallets.remaining_amount) AS total_remaining_amount,
+        users.id AS usId,
+        users.ic,
+        users.first_name,
+        users.last_name
+    ');
+    $builder->join('users', 'wallets.user_id = users.id');
+    $builder->where('wallets.status', 'active');
+    $builder->groupBy('wallets.user_id');
+
+    $query = $builder->get();
+    return $query->getResult();
+}
 
 }

@@ -104,9 +104,9 @@ class Positions extends BaseController
          if ($data) {
 
             $table = '<table class="table table-striped table-bordered table-sm">';
-            $table .= '<tr><th>' . lang('app.positions.title') . '</th><td>' . $data['title'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.positions.description') . '</th><td>' . $data['description'] . '</td></tr>';
-            $table .= '<tr><th>' . lang('app.positions.created_at') . '</th><td>' . $data['created_at'] . '</td></tr>';
+            $table .= '<tr><th>Nombre</th><td>' . $data['title'] . '</td></tr>';
+            $table .= '<tr><th>Descripción</th><td>' . $data['description'] . '</td></tr>';
+            $table .= '<tr><th>Creado El</th><td>' . $data['created_at'] . '</td></tr>';
             $table .= '</table>';
             return $this->respond($table);
          } else {
