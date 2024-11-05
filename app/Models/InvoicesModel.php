@@ -48,6 +48,13 @@ class InvoicesModel extends Model
       foreach ($query as $index => $value) {
          $query[$index]['first_name'] = $query[$index]['first_name'] . ' ' . $query[$index]['last_name'];
 
+         if ($query[$index]['amount_paid'] == $query[$index]['invoice_total']) {
+            $query[$index]['check'] = '<span style="font-size: 20px; color: green;"><i class="bi bi-check2-circle"></i></span>';
+         } else {
+            $query[$index]['check'] = '<span style="font-size: 20px; color: red;"><i class="bi bi-x-circle"></i></span>';
+         }
+
+
          $query[$index]['column_bulk'] = '<input type="checkbox" class="bulk-item" value="' . $query[$index][$this->primaryKey] . '">';
          $query[$index]['column_action'] = '<a class="btn btn-sm btn-xs btn-danger" href="' . base_url('invoices/printvoucherView/') . $query[$index][$this->primaryKey] . '"><i class="bi bi-file-earmark-pdf"></i></a> <button class="btn btn-sm btn-xs btn-success form-action" item-id="' . $query[$index][$this->primaryKey] . '" purpose="detail"><i class="bi bi-eye"></i></button> <button class="btn btn-sm btn-xs btn-warning form-action" purpose="edit" item-id="' . $query[$index][$this->primaryKey] . '"><i class="bi bi-pencil-square"></i></button> <button class="btn btn-sm btn-xs btn-info send-email" item-id="' . $query[$index][$this->primaryKey] . '" style="border-radius: 1px;"><i class="bi bi-envelope"></i></button>';
       }
@@ -112,5 +119,38 @@ class InvoicesModel extends Model
 
       // Retornar el array completo que incluye la factura y los detalles
       return $invoiceData;
+   }
+
+   public function updatePaymentAmounts($invoiceId, $paymentAmount)
+   {
+      $invoice = $this->find($invoiceId);
+      if (!$invoice) {
+         throw new \Exception('Factura no encontrada');
+      }
+
+      // Verificar que el pago no exceda el monto pendiente
+      if ($paymentAmount > $invoice['amount_due']) {
+         throw new \Exception('El monto del pago excede el saldo pendiente de la factura');
+      }
+
+      // Calcular nuevos montos
+      $newAmountPaid = $invoice['amount_paid'] + $paymentAmount;
+      $newAmountDue = $invoice['amount_due'] - $paymentAmount;
+
+      // Actualizar la factura
+      $updated = $this->update($invoiceId, [
+         'amount_paid' => $newAmountPaid,
+         'amount_due' => $newAmountDue
+      ]);
+
+      if (!$updated) {
+         throw new \Exception('Error al actualizar los montos de la factura');
+      }
+
+      return [
+         'invoice_id' => $invoiceId,
+         'new_amount_paid' => $newAmountPaid,
+         'new_amount_due' => $newAmountDue
+      ];
    }
 }

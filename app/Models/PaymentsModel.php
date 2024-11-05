@@ -1,5 +1,5 @@
 <?php
-// app/Models/PaymentModel.php
+
 namespace App\Models;
 
 use CodeIgniter\Model;
@@ -22,23 +22,34 @@ class PaymentsModel extends Model
 
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
-    protected $updatedField = ''; // No usamos updated_at en esta tabla
+    protected $updatedField = '';
 
     public function makePayment($invoiceId, $walletId, $amount)
     {
         $db = \Config\Database::connect();
         $WalletsModel = new WalletsModel();
+        $InvoiceModel = new InvoicesModel();
 
         $db->transStart();
 
         try {
-            // Primero obtenemos el wallet actual para verificar fondos
+            // 1. Verificar y obtener la factura
+            $invoice = $InvoiceModel->find($invoiceId);
+            if (!$invoice) {
+                throw new \Exception('Factura no encontrada');
+            }
+
+            if ($amount > $invoice['amount_due']) {
+                throw new \Exception('El monto del pago excede el saldo pendiente de la factura');
+            }
+
+            // 2. Verificar el wallet
             $currentWallet = $WalletsModel->find($walletId);
             if (!$currentWallet || $currentWallet['remaining_amount'] < $amount) {
                 throw new \Exception('Fondos insuficientes en el wallet');
             }
 
-            // Actualizamos el remaining_amount del wallet
+            // 3. Actualizar el remaining_amount del wallet
             $newRemaining = $currentWallet['remaining_amount'] - $amount;
             $walletUpdated = $WalletsModel->update($walletId, [
                 'remaining_amount' => $newRemaining
@@ -48,7 +59,10 @@ class PaymentsModel extends Model
                 throw new \Exception('Error al actualizar el wallet');
             }
 
-            // Preparamos los datos del pago
+            // 4. Actualizar los montos de la factura
+            $invoiceResult = $InvoiceModel->updatePaymentAmounts($invoiceId, $amount);
+
+            // 5. Registrar el pago
             $payment = [
                 'invoice_id' => $invoiceId,
                 'amount_paid' => $amount,
@@ -59,7 +73,6 @@ class PaymentsModel extends Model
                 'created_at' => date('Y-m-d H:i:s')
             ];
 
-            // Insertamos el pago
             if (!$this->insert($payment)) {
                 throw new \Exception('Error al registrar el pago');
             }
@@ -74,7 +87,12 @@ class PaymentsModel extends Model
                 'success' => true,
                 'message' => 'Pago registrado exitosamente',
                 'payment_id' => $this->insertID(),
-                'new_balance' => $newRemaining
+                'wallet_balance' => $newRemaining,
+                'invoice' => [
+                    'id' => $invoiceId,
+                    'amount_paid' => $invoiceResult['new_amount_paid'],
+                    'amount_due' => $invoiceResult['new_amount_due']
+                ]
             ];
         } catch (\Exception $e) {
             $db->transRollback();

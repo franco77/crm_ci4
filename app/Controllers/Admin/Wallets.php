@@ -6,6 +6,7 @@ use App\Controllers\Admin\BaseController;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\WalletsModel;
 use App\Models\PaymentsModel;
+use App\Models\InvoicesModel;
 use IonAuth\Libraries\IonAuth;
 
 class Wallets extends BaseController
@@ -15,8 +16,9 @@ class Wallets extends BaseController
 
    public function __construct()
    {
-      $this->WalletsModel = new WalletsModel;
+      $this->WalletsModel = new WalletsModel();
       $this->PaymentsModel = new PaymentsModel();
+      $this->InvoicesModel = new InvoicesModel();
       $this->ionAuth = new IonAuth();
    }
 
@@ -74,11 +76,18 @@ class Wallets extends BaseController
       $userId = $this->request->getGet('user_id');
       $wallets = $this->WalletsModel->getUserWallets($userId);
 
+
       return $this->response->setJSON([
          'success' => true,
          'wallets' => $wallets
       ]);
    }
+
+
+
+
+
+
 
    public function makePayment()
    {
@@ -132,6 +141,25 @@ class Wallets extends BaseController
       }
    }
 
+
+   public function getInvoiceDetails()
+   {
+      $invoiceId = $this->request->getGet('invoice_id');
+
+      $invoice = $this->InvoicesModel->find($invoiceId);
+
+      if (!$invoice) {
+         return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Factura no encontrada'
+         ]);
+      }
+
+      return $this->response->setJSON([
+         'success' => true,
+         'invoice' => $invoice
+      ]);
+   }
 
 
 
