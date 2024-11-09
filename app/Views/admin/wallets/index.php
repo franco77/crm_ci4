@@ -1,68 +1,92 @@
 <?= $this->extend("admin/layout/default") ?>
 <?= $this->section("content") ?>
 <div class="container-fluid py-4">
+    <!-- Main Content Row -->
     <div class="row">
-        <!-- Sección de Selección de Usuario y Wallet -->
+        <!-- Left Column: User & Wallet Selection -->
         <div class="col-12 col-md-6 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-primary text-white">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white py-3">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-wallet me-2"></i>Gestión de Wallet
                     </h5>
                 </div>
                 <div class="card-body">
+                    <!-- User Selection -->
                     <div class="mb-4">
-                        <label for="user_select" class="form-label fw-bold">Seleccionar Usuario:</label>
-                        <select id="user_select" class="form-select form-select-lg">
+                        <label for="user_select" class="form-label fw-semibold">
+                            <i class="fas fa-user me-1"></i>Seleccionar Usuario:
+                        </label>
+                        <select id="user_select" class="form-select form-select-lg" required>
                             <option value="">Seleccione un usuario</option>
                             <?php foreach ($users as $user): ?>
-                                <option value="<?= $user->id ?>">
-                                    <?= esc($user->first_name) ?> - <?= esc($user->email) ?>
+                                <option value="<?= esc($user->id) ?>">
+                                    <?= esc($user->first_name . ' ' . $user->last_name) ?> - <?= esc($user->email) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <div class="invalid-feedback">Por favor seleccione un usuario</div>
                     </div>
 
+                    <!-- Wallet Selection -->
                     <div class="mb-4">
-                        <label for="wallet_select" class="form-label fw-bold">Seleccionar Wallet:</label>
-                        <select id="wallet_select" class="form-select form-select-lg" disabled>
+                        <label for="wallet_select" class="form-label fw-semibold">
+                            <i class="fas fa-credit-card me-1"></i>Seleccionar Wallet:
+                        </label>
+                        <select id="wallet_select" class="form-select form-select-lg" disabled required>
                             <option value="">Primero seleccione un usuario</option>
                         </select>
+                        <div class="invalid-feedback">Por favor seleccione un wallet</div>
                     </div>
 
-                    <!-- Información del Wallet -->
+                    <!-- Wallet Information Card -->
                     <div id="wallet_info" class="d-none">
-                        <div class="card bg-light">
+                        <div class="card bg-light border-0">
                             <div class="card-body">
-                                <h6 class="card-subtitle mb-3 text-muted">Detalles del Wallet</h6>
+                                <h6 class="card-subtitle mb-3 text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>Detalles del Wallet
+                                </h6>
                                 <div class="row g-3">
+                                    <!-- Total Amount Card -->
                                     <div class="col-6">
-                                        <div class="p-3 bg-white rounded shadow-sm">
-                                            <small class="text-muted d-block">Monto Total</small>
-                                            <span id="total_amount" class="h5 mb-0 d-block">$0.00</span>
+                                        <div class="p-3 bg-white rounded shadow-sm h-100">
+                                            <small class="text-muted d-block mb-1">
+                                                <i class="fas fa-money-bill-wave me-1"></i>Monto Total
+                                            </small>
+                                            <span id="total_amount" class="h5 mb-0 d-block fw-bold">$0.00</span>
                                         </div>
                                     </div>
+                                    <!-- Available Amount Card -->
                                     <div class="col-6">
-                                        <div class="p-3 bg-white rounded shadow-sm">
-                                            <small class="text-muted d-block">Monto Disponible</small>
+                                        <div class="p-3 bg-white rounded shadow-sm h-100">
+                                            <small class="text-muted d-block mb-1">
+                                                <i class="fas fa-wallet me-1"></i>Monto Disponible
+                                            </small>
                                             <span id="available_amount"
-                                                class="h5 mb-0 d-block text-success">$0.00</span>
+                                                class="h5 mb-0 d-block text-success fw-bold">$0.00</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-3">
-                                    <p class="mb-1">
-                                        <strong>Fecha de Depósito:</strong>
-                                        <span id="deposit_date" class="text-muted">-</span>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong>Método:</strong>
-                                        <span id="payment_method" class="text-muted">-</span>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong>Referencia:</strong>
-                                        <span id="reference" class="text-muted">-</span>
-                                    </p>
+
+                                <!-- Additional Wallet Details -->
+                                <div class="mt-4">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item bg-transparent px-0">
+                                            <i class="fas fa-calendar-alt me-2"></i>
+                                            <strong>Fecha de Depósito:</strong>
+                                            <span id="deposit_date" class="text-muted ms-2">-</span>
+                                        </li>
+                                        <li class="list-group-item bg-transparent px-0">
+                                            <i class="fas fa-money-check-alt me-2"></i>
+                                            <strong>Método de Pago:</strong>
+                                            <span id="payment_method" class="text-muted ms-2">-</span>
+                                        </li>
+                                        <li class="list-group-item bg-transparent px-0">
+                                            <i class="fas fa-hashtag me-2"></i>
+                                            <strong>Referencia:</strong>
+                                            <span id="reference" class="text-muted ms-2">-</span>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -71,131 +95,158 @@
             </div>
         </div>
 
-        <!-- Sección de Pagos -->
+        <!-- Right Column: Payment Processing -->
         <div class="col-12 col-md-6 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-success text-white">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-success text-white py-3">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-money-bill-wave me-2"></i>Realizar Pago
                     </h5>
                 </div>
                 <div class="card-body">
+                    <!-- Alert Container -->
                     <div id="invoice_alert" class="alert alert-dismissible fade mt-3 d-none" role="alert">
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-exclamation-circle-fill me-2"></i>
+                            <i class="fas fa-exclamation-circle me-2"></i>
                             <div id="invoice_alert_message"></div>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                    <form id="payment_form">
-                        <div class="mb-3">
-                            <label for="invoice_id" class="form-label fw-bold">Número de Factura:</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-file-earmark-text"></i></span>
+
+                    <!-- Payment Form -->
+                    <form id="payment_form" class="needs-validation" novalidate>
+                        <!-- Invoice Input -->
+                        <div class="mb-4">
+                            <label for="invoice_id" class="form-label fw-semibold">
+                                <i class="fas fa-file-invoice me-1"></i>Número de Factura:
+                            </label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
                                 <input type="number" id="invoice_id" class="form-control form-control-lg"
-                                    placeholder="Ingrese el número de factura" required>
+                                    placeholder="Ingrese el número de factura" required min="1">
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un número de factura válido
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Amount Input -->
                         <div class="mb-4">
-                            <label for="amount" class="form-label fw-bold">Monto a Pagar:</label>
-                            <div class="input-group">
+                            <label for="amount" class="form-label fw-semibold">
+                                <i class="fas fa-dollar-sign me-1"></i>Monto a Pagar:
+                            </label>
+                            <div class="input-group has-validation">
                                 <span class="input-group-text">$</span>
                                 <input type="number" id="amount" class="form-control form-control-lg" step="0.01"
-                                    placeholder="0.00" required>
+                                    placeholder="0.00" required min="0.01">
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un monto válido
+                                </div>
                             </div>
                             <small id="amount_warning" class="text-danger d-none">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
                                 El monto excede el saldo disponible
                             </small>
                         </div>
 
+                        <!-- Submit Button -->
                         <button type="submit" class="btn btn-success btn-lg w-100" id="submit_payment" disabled>
                             <i class="fas fa-check-circle me-2"></i>Procesar Pago
                         </button>
                     </form>
 
-                    <!-- Historial de Pagos -->
-                    <div id="payment_history" class="mt-4 d-none">
-                        <h6 class="border-bottom pb-2">Últimos Pagos</h6>
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Factura</th>
-                                        <th>Monto</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="payment_history_body">
-                                    <!-- Se llenará dinámicamente -->
-                                </tbody>
-                            </table>
+                    <!-- Invoice Details Card -->
+                    <div id="invoice_details" class="card mt-4 border-0 bg-light d-none">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-3 text-muted">
+                                <i class="fas fa-file-invoice me-1"></i>Detalles de la Factura
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <div class="p-2 bg-white rounded shadow-sm text-center">
+                                        <small class="text-muted d-block mb-1">Referencia</small>
+                                        <div id="invoice_uuid" class="h6 mb-0 text-truncate"></div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="p-2 bg-white rounded shadow-sm text-center">
+                                        <small class="text-muted d-block mb-1">Total</small>
+                                        <div id="invoice_total" class="h6 mb-0 text-primary"></div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="p-2 bg-white rounded shadow-sm text-center">
+                                        <small class="text-muted d-block mb-1">Pagado</small>
+                                        <div id="invoice_paid" class="h6 mb-0 text-success"></div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="p-2 bg-white rounded shadow-sm text-center">
+                                        <small class="text-muted d-block mb-1">Pendiente</small>
+                                        <div id="invoice_due" class="h6 mb-0 text-danger"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="invoice_details" class="card mt-3 d-none">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">Detalles de la Factura</h6>
-                <div class="row">
-                    <div class="col-3">
-                        <small>#</small>
-                        <div id="invoice_uuid" class="h6"></div>
-                    </div>
-                    <div class="col-3">
-                        <small>Total</small>
-                        <div id="invoice_total" class="h6"></div>
-                    </div>
-                    <div class="col-3">
-                        <small>Pagado</small>
-                        <div id="invoice_paid" class="h6"></div>
-                    </div>
-                    <div class="col-3">
-                        <small>Pendiente</small>
-                        <div id="invoice_due" class="h6"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-    </div>
-
-    <!-- Modales -->
-    <div class="modal fade" id="successModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">Pago Exitoso</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center py-4">
-                    <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
-                    <h5 class="mb-2">¡Pago Procesado!</h5>
-                    <p class="mb-0" id="success_message"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>Pago Exitoso
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success fa-4x"></i>
+                </div>
+                <h5 class="mb-3">¡Pago Procesado!</h5>
+                <p class="mb-0" id="success_message"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
-<!-- /.content -->
 
-<!-- / Incluir la libreria toastr  -->
-<!-- page script -->
 <?= $this->section("js") ?>
-<!-- Primero, añade SweetAlert2 en el head de tu layout -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Initialize form validation
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
 
         function showBootstrapAlert(message, type = 'warning') {
             const $alert = $('#invoice_alert');
@@ -354,23 +405,24 @@
                     Swal.close();
 
                     if (response.success) {
-                        const newWalletBalance = response.wallet_balance !== undefined ? response
-                            .wallet_balance : 0;
+                        // Actualizar la interfaz con los nuevos valores
+                        updateWalletDisplay(response.wallet_balance);
+                        updateInvoiceDisplay(response.invoice);
 
                         showSuccess('Pago Procesado Exitosamente', `
-                    <div class="text-left">
-                        <p><strong>Monto pagado:</strong> $${amount}</p>
-                        <p><strong>Nuevo saldo en wallet:</strong> $${newWalletBalance}</p>
-                        <p><strong>Saldo pendiente factura:</strong> $${response.invoice.amount_due}</p>
+                    <div class="text-start">
+                        <p><strong>Monto pagado:</strong> $${formatNumber(amount)}</p>
+                        <p><strong>Nuevo saldo en wallet:</strong> $${formatNumber(response.wallet_balance)}</p>
+                        <p><strong>Saldo pendiente factura:</strong> $${formatNumber(response.invoice.amount_due)}</p>
                     </div>
                 `);
 
-                        // Limpiar el formulario y recargar el select de wallets para obtener datos actualizados
+                        // Limpiar formulario
                         $('#payment_form')[0].reset();
-                        $('#invoice_details').addClass('d-none');
 
-                        // Recargar el select de wallets con datos actualizados
-                        reloadWalletSelect(true); // Llamada con true para forzar recarga
+                        // Recargar los datos del wallet
+                        const userId = $('#user_select').val();
+                        refreshWalletData(userId, walletId);
                     } else {
                         showError(response.message || 'Error al procesar el pago');
                     }
@@ -378,6 +430,54 @@
                 error: function() {
                     Swal.close();
                     showError('Error al procesar el pago');
+                }
+            });
+        }
+
+
+        function updateInvoiceDisplay(invoice) {
+            $('#invoice_total').text(`$${formatNumber(invoice.invoice_total)}`);
+            $('#invoice_paid').text(`$${formatNumber(invoice.amount_paid)}`);
+            $('#invoice_due').text(`$${formatNumber(invoice.amount_due)}`);
+        }
+
+
+        // Función para refrescar los datos del wallet
+        function refreshWalletData(userId, walletId) {
+            $.ajax({
+                url: '<?= base_url('admin/wallets/getUserWallets') ?>',
+                method: 'GET',
+                data: {
+                    user_id: userId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const $walletSelect = $('#wallet_select');
+                        $walletSelect.html('<option value="">Seleccione un wallet</option>');
+
+                        response.wallets.forEach(wallet => {
+                            const option = `
+                        <option value="${wallet.id}" 
+                                data-amount="${wallet.amount}"
+                                data-remaining="${wallet.remaining_amount}"
+                                data-date="${wallet.deposit_date}"
+                                data-payment-method="${wallet.payment_method}"
+                                data-reference="${wallet.reference}">
+                            Wallet #${wallet.id} - $${formatNumber(wallet.remaining_amount)} disponible
+                        </option>
+                    `;
+                            $walletSelect.append(option);
+                        });
+
+                        // Seleccionar el wallet que estaba activo
+                        if (walletId) {
+                            $walletSelect.val(walletId);
+                            const selectedWallet = response.wallets.find(w => w.id == walletId);
+                            if (selectedWallet) {
+                                updateWalletInfoDisplay(selectedWallet);
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -448,26 +548,39 @@
 
 
 
+        // Función auxiliar para formatear números
+        function formatNumber(number) {
+            if (number === undefined || number === null) return '0.00';
+            return parseFloat(number).toLocaleString('es-CO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Función para actualizar la información del wallet
         function updateWalletInfoDisplay(wallet) {
-            $('#available_amount').text(`$${wallet.remaining_amount}`);
-            $('#deposit_date').text(wallet.deposit_date);
+            $('#available_amount').text(`$${formatNumber(wallet.remaining_amount)}`);
+            $('#total_amount').text(`$${formatNumber(wallet.amount)}`);
+            $('#deposit_date').text(wallet.deposit_date || '-');
             $('#payment_method').text(wallet.payment_method || '-');
             $('#reference').text(wallet.reference || '-');
             $('#wallet_info').removeClass('d-none');
         }
 
         function updateWalletDisplay(newBalance) {
+            const formattedBalance = formatNumber(newBalance);
             const $selectedOption = $('#wallet_select option:selected');
+            const walletId = $selectedOption.val();
 
-            // Solo actualizar si `newBalance` es un número válido
-            if (typeof newBalance === 'number' && !isNaN(newBalance)) {
-                $selectedOption.data('remaining', newBalance);
-                $selectedOption.text(`Wallet #${$selectedOption.val()} - $${newBalance} disponible`);
-                $('#available_amount').text(`$${newBalance}`);
-            } else {
-                console.error("Saldo del wallet inválido:", newBalance);
-                showError("Error: Saldo del wallet no válido recibido del servidor.");
-            }
+            // Actualizar el texto de la opción seleccionada
+            $selectedOption.text(`Wallet #${walletId} - $${formattedBalance} disponible`);
+
+            // Actualizar los datos del wallet
+            $selectedOption.data('remaining', newBalance);
+
+            // Actualizar la visualización
+            $('#total_amount').text(`$${formattedBalance}`);
+            $('#available_amount').text(`$${formattedBalance}`);
         }
 
         function validateForm() {
@@ -576,5 +689,4 @@
         $('#amount').on('input', validateForm);
     });
 </script>
-
 <?= $this->endSection() ?>
