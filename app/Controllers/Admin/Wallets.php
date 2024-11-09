@@ -85,10 +85,6 @@ class Wallets extends BaseController
 
 
 
-
-
-
-
    public function makePayment()
    {
       try {

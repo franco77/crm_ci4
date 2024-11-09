@@ -84,6 +84,9 @@
                         <li class="slide">
                             <a href="<?= base_url('admin/deductions') ?>" class="side-menu__item">Deducciones</a>
                         </li>
+                        <li class="slide">
+                            <a href="<?= base_url('admin/payrolls') ?>" class="side-menu__item">Pagar Nomina</a>
+                        </li>
 
                     </ul>
                 </li>
@@ -120,17 +123,29 @@
                         <li class="slide">
                             <a href="<?= base_url('admin/invoices') ?>" class="side-menu__item">Facturas</a>
                         </li>
+                        <li class="slide">
+                            <a href="<?= base_url('admin/wallets') ?>" class="side-menu__item">Cartera</a>
+                        </li>
+                        <li class="slide">
+                            <a href="<?= base_url('admin/payments') ?>" class="side-menu__item">Lista De Pagos</a>
+                        </li>
                     </ul>
                 </li>
                 <!-- End::slide -->
 
                 <!-- End::slide -->
+                <li class="slide">
+                    <a href="<?= base_url('admin/wallets/viewWallet') ?>" class="side-menu__item">
+                        <i class='bx bxs-wallet side-menu__icon'></i>
+                        <span class="side-menu__label">Pagar Facturas</span>
+                    </a>
+                </li>
 
                 <!-- Start::slide -->
                 <li class="slide">
-                    <a href="icons.html" class="side-menu__item">
-                        <i class="bx bx-store-alt side-menu__icon"></i>
-                        <span class="side-menu__label">Icons</span>
+                    <a href="<?= base_url('admin/messages') ?>" class="side-menu__item">
+                        <i class='bx bx-comment-dots side-menu__icon'></i>
+                        <span class="side-menu__label">Mensajes</span>
                     </a>
                 </li>
                 <!-- End::slide -->

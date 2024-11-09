@@ -2,36 +2,68 @@
 <?= $this->section("content") ?>
 <div class="row">
     <div class="col-md-12">
-        <div class="card">
+        <div class="card custom-card">
             <div class="card-header">
-                <div class="card-title"><?= $title ?></div>
+                <h5 class="card-title mb-0">Right Aligned Nav</h5>
             </div>
             <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                    <div>
-                        <button class="btn btn-sm btn-danger bulk-delete">Eliminar</button>
-                        <button class="btn btn-sm btn-primary refresh" purpose="add">Refrescar</button>
+                <ul class="nav nav-pills nav-style-3 mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="home-tab" data-bs-toggle="tab" href="#payments" role="tab"
+                            aria-controls="payments" aria-selected="true">
+                            Pagos
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="about-tab" data-bs-toggle="tab" href="#totalPay" role="tab"
+                            aria-controls="totalPay" aria-selected="false">
+                            Total Pagos
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <!-- Home Tab -->
+                    <div class="tab-pane fade show active text-muted" id="payments" role="tabpanel"
+                        aria-labelledby="home-tab">
+                        <div class="d-flex justify-content-between mb-3">
+                            <button class="btn btn-sm btn-primary refresh" data-purpose="add">Refrescar</button>
+                        </div>
+                        <table id="datatable" class="table table-sm activate-select dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="check-items"></th>
+                                    <th># Factura</th>
+                                    <th>Mono Pago</th>
+                                    <th>Fecha Pago</th>
+                                    <th>Referencia</th>
+                                    <th>Generado Por</th>
+                                    <th>#</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
-                    <button class="btn btn-sm btn-primary form-action" purpose="add">Agregar</button>
-
+                    <!-- About Tab -->
+                    <div class="tab-pane fade text-muted" id="totalPay" role="tabpanel" aria-labelledby="about-tab">
+                        <table id="totals-table" class="table table-sm activate-select">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="check-items"></th>
+                                    <th># Factura</th>
+                                    <th>Total Pagado</th>
+                                    <th># Pagos</th>
+                                    <th>Último Pago</th>
+                                    <th>Pagado Por</th>
+                                    <th>#</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
-                <table id="datatable" class="table table-striped table-bordered table-sm" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th style="width: 0px"><input type="checkbox" class="check-items"></th>
-                            <th>Cliente</th>
-                            <th>Monto</th>
-                            <th>Cantidad restante</th>
-                            <th>Fecha de depósito</th>
-                            <th>Soporte</th>
-                            <th style="width: 0px">#</th>
-                        </tr>
-                    </thead>
-                </table>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <div class="modal modal-form fade" tabindex="-1" role="dialog">
@@ -65,8 +97,10 @@ $(document).ready(function() {
         info: true,
         autoWidth: false,
         scrollY: '45vh',
-        responsive: false,
+        responsive: true,
         orderCellsTop: true,
+        destroy: true,
+        stateSave: false,
         ajax: {
             url: host + "data",
             type: "POST"
@@ -77,19 +111,22 @@ $(document).ready(function() {
                 "orderable": false
             },
             {
-                "data": "user_id"
+                data: "invoice_id",
+                render: function(data, type, row) {
+                    return `FAC-${data}`;
+                }
             },
             {
-                "data": "amount"
+                "data": "amount_paid"
             },
             {
-                "data": "remaining_amount"
+                "data": "payment_date"
             },
             {
-                "data": "deposit_date"
+                "data": "payment_reference"
             },
             {
-                "data": "support"
+                "data": "paid_by"
             },
             {
                 "data": "column_action",
@@ -100,6 +137,65 @@ $(document).ready(function() {
         "order": [
             [1, "DESC"]
         ]
+    });
+
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+        const target = $(e.target).attr("href"); // La pestaña activa
+
+        if (target === "#totalPay" && !$.fn.DataTable.isDataTable("#totals-table")) {
+
+            const totalsTable = $('#totals-table').DataTable({
+                processing: true,
+                serverSide: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                scrollY: '45vh',
+                responsive: false,
+                orderCellsTop: true,
+                destroy: true,
+                stateSave: false,
+                ajax: {
+                    url: host + "invoiceTotals",
+                    type: "POST"
+                },
+                columns: [{
+                        data: "column_bulk",
+                        searchable: false,
+                        orderable: false
+                    },
+                    {
+                        data: "invoice_id",
+                        render: function(data, type, row) {
+                            return `FAC-${data}`;
+                        }
+                    },
+
+                    {
+                        data: "total_amount"
+                    },
+                    {
+                        data: "payment_count"
+                    },
+                    {
+                        data: "last_payment_date",
+
+                    },
+                    {
+                        data: "paid_by_users"
+                    },
+                    {
+                        data: "column_action",
+                        searchable: false,
+                        orderable: false
+                    }
+                ],
+                order: [
+                    [1, "DESC"]
+                ]
+            });
+        }
     });
 
     function refreshTable() {
@@ -124,7 +220,8 @@ $(document).ready(function() {
             const errors = jQuery.parseJSON(res.responseText);
             $.each(errors.messages, function(selector, value) {
                 $('[for="' + selector + '"]').after(
-                    '<small class="form-text text-danger">' + value + '</small>');
+                    '<small class="form-text text-danger">' + value + '</small>'
+                );
                 $('[name="' + selector + '"]').addClass('is-invalid');
             });
             toastr.error(errorMessage);

@@ -118,11 +118,11 @@
                         <!-- Invoice Input -->
                         <div class="mb-4">
                             <label for="invoice_id" class="form-label fw-semibold">
-                                <i class="fas fa-file-invoice me-1"></i>Número de Factura:
+                                Número de Factura:
                             </label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text">
-                                    <i class="fas fa-hashtag"></i>
+                                    <i class="bi bi-file-earmark-text"></i>
                                 </span>
                                 <input type="number" id="invoice_id" class="form-control form-control-lg"
                                     placeholder="Ingrese el número de factura" required min="1">
