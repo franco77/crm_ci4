@@ -152,6 +152,25 @@ class Products extends BaseController
       }
    }
 
+
+   public function getDetails($productId)
+   {
+
+      $product = $this->ProductsModel->find($productId);
+
+      if ($product) {
+         return $this->response->setJSON([
+            'success' => true,
+            'product' => $product
+         ]);
+      }
+
+      return $this->response->setJSON([
+         'success' => false,
+         'message' => 'Producto no encontrado'
+      ]);
+   }
+
    public function list()
    {
 
