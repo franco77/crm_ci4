@@ -352,25 +352,63 @@ $(document).ready(function() {
     }
 
 
-    function addToWishlist(productId) {
+    // Mover las funciones fuera del scope de document.ready para hacerlas globalmente accesibles
+    window.addToCart = function(productId) {
         $.ajax({
-            url: baseUrl + 'admin/wishlist/add',
+            url: baseUrl + 'admin/cart/add',
             method: 'POST',
             data: {
                 product_id: productId
             },
             success: function(response) {
                 if (response.success) {
-                    toastr.success('Producto añadido a favoritos correctamente!');
+                    toastr.success('Producto añadido al carrito correctamente!');
                 } else {
-                    toastr.error('No se pudo añadir el producto a favoritos. Intenta nuevamente.');
+                    toastr.error(
+                        'No se pudo añadir el producto al carrito. Intenta nuevamente.');
                 }
             },
             error: function() {
                 toastr.error('Ocurrió un error. Por favor, intenta nuevamente.');
             }
         });
-    }
+    };
+
+    window.addToWishlist = function(productId) {
+        const $icon = $(`#wishlist-icon-${productId}`);
+        const isInWishlist = $icon.hasClass('ri-heart-fill');
+
+        // URL y método dependiendo de si está agregando o removiendo
+        const url = baseUrl + 'admin/wishlist/' + (isInWishlist ? 'remove' : 'add');
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                product_id: productId
+            },
+            success: function(response) {
+                if (response.success) {
+                    if (isInWishlist) {
+                        // Remover de wishlist
+                        $icon.removeClass('ri-heart-fill text-danger')
+                            .addClass('ri-heart-line');
+                        toastr.success('Producto eliminado de favoritos');
+                    } else {
+                        // Agregar a wishlist
+                        $icon.removeClass('ri-heart-line')
+                            .addClass('ri-heart-fill text-danger');
+                        toastr.success('Producto añadido a favoritos');
+                    }
+                } else {
+                    toastr.error(response.message || 'Error al procesar la solicitud');
+                }
+            },
+            error: function() {
+                toastr.error('Ocurrió un error. Por favor, intenta nuevamente.');
+            }
+        });
+    };
 
     // Inicializar eventos para productos existentes
     initializeProductEvents();
@@ -460,8 +498,6 @@ $(document).ready(function() {
 
     // Función mejorada para actualizar el contenido
     function updateModalContent(product) {
-        console.log('Actualizando modal con datos:', product); // Debug
-
         const modalContent = `
             <div class="row">
                 <div class="col-md-6">
@@ -492,18 +528,22 @@ $(document).ready(function() {
                         <h6 class="text-muted mb-2">Descripción:</h6>
                         <p class="text-justify">${product.productDescription}</p>
                     </div>
-                  <button class="btn btn-primary btn-wave" onclick="addToCart(${product.id})">
-                    <i class="ri-shopping-cart-line me-2"></i>Agregar al Carrito
-                </button>
-                <button class="btn btn-outline-primary btn-wave" onclick="addToWishlist(${product.id})">
-                    <i class="ri-heart-line me-2"></i>Agregar a Favoritos
-                </button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary btn-wave" onclick="addToCart(${product.id})">
+                            <i class="ri-shopping-cart-line me-2"></i>Agregar al Carrito
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-wave" onclick="addToWishlist(${product.id})">
+                            <i class="ri-heart-line me-2" id="wishlist-icon-${product.id}"></i>Agregar a Favoritos
+                        </button>
                     </div>
                 </div>
             </div>
         `;
 
-        modal.body.html(modalContent);
+        $('#productModal .modal-body').html(modalContent);
+
+        // Verificar estado del wishlist después de cargar el contenido
+        checkWishlistStatus(product.id);
     }
 
     // Evento mejorado para el botón de vista

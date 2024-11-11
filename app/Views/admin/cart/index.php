@@ -7,15 +7,15 @@
             <div class="card custom-card" id="cart-container">
                 <div class="card-header">
                     <div class="card-title">
-                        Shopping Cart
+                        Carrito de compras
                     </div>
                 </div>
                 <div class="card-body">
                     <?php if (empty($cartItems)): ?>
                     <div class="text-center">
-                        <h3>Your cart is empty</h3>
-                        <p>Add some items to your cart to get started!</p>
-                        <a href="<?= base_url('products') ?>" class="btn btn-primary">Continue Shopping</a>
+                        <h3>Tu carrito esta vacío</h3>
+                        <p>¡Agrega algunos artículos a tu carrito para comenzar!</p>
+                        <a href="<?= base_url('products') ?>" class="btn btn-primary">Seguir comprando</a>
                     </div>
                     <?php else: ?>
                     <div class="table-responsive">
@@ -263,7 +263,7 @@ $(document).ready(function() {
                             // Si el carrito está vacío, mostrar el mensaje de carrito vacío
                             if (response.subtotal == '0.00') {
                                 $('#cart-container').html(
-                                    '<div class="text-center"><h3>Your cart is empty</h3><a href="<?= base_url('products') ?>" class="btn btn-primary">Continue Shopping</a></div>'
+                                    ' <div class="card-header"><div class="card-title">Carrito de compras</div></div><div class="card-body"><div class="text-center"><h3>Tu carrito esta vacío</h3><a href="<?= base_url('products') ?>" class="btn btn-primary">Seguir comprando</a></div></div>'
                                 );
                             }
                         } else {
