@@ -9,9 +9,13 @@
 </head>
 <style>
     :root {
+        --font-family: Arial, sans-serif;
         --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         --background-color: <?= setting('App.corporateColor') ?>;
         --color: #fff;
+        --text-color: #333;
+        --border-color: #e0e0e0;
+        --highlight-color: #0e9bed;
     }
 
     * {
@@ -21,145 +25,118 @@
     }
 
     body {
-        padding: 15px;
-        position: relative;
-        line-height: 1.5;
-        background-color: #FFF;
-        font-family: var(--font-family-monospace);
+        padding: 20px;
+        font-family: var(--font-family);
+        color: var(--text-color);
     }
 
     .invoice-container {
-        min-height: 680px;
-        background-color: white;
-        padding: 10px;
+        background-color: #fff;
+        padding: 25px;
         width: 98%;
+        max-width: 800px;
+        margin: 0 auto;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
     header {
-        border-bottom: 2px solid #e5e5e5;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 15px;
+        margin-bottom: 25px;
     }
 
-    .logo h1 {
-        font-size: 24px;
-        color: #333;
-    }
-
-    .highlight {
-        color: var(--background-color);
-    }
-
-    .invoice-title {
-        margin-top: 10px;
-        text-align: right;
+    .logo img {
+        max-width: 100px;
     }
 
     .invoice-title h2 {
-        font-size: 24px;
+        font-size: 26px;
         font-weight: bold;
-        color: #333;
+        color: var(--highlight-color);
     }
 
     .invoice-header {
-        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
     }
 
     .company-info,
     .client-info {
         width: 45%;
         font-size: 14px;
+    }
+
+    .company-info p,
+    .client-info p {
+        margin-bottom: 8px;
         color: #555;
-        display: inline-block;
-        vertical-align: top;
     }
 
-    .company-info {
-        float: left;
+    .summary-table th,
+    .summary-table td {
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid var(--border-color);
     }
 
-    .client-info {
-        float: right;
+    .summary-table th {
+        background-color: var(--background-color);
+        color: var(--color);
+        text-align: left;
+    }
+
+    .summary-table td {
         text-align: right;
-    }
-
-    .invoice-details {
-        margin-bottom: 20px;
-        clear: both;
     }
 
     .invoice-table {
         width: 100%;
         border-collapse: collapse;
+        margin-top: 20px;
         margin-bottom: 20px;
+        font-size: 14px;
     }
 
     .invoice-table th,
     .invoice-table td {
-        border: 1px solid #ccc;
-        padding: 8px;
+        padding: 12px;
+        border: 1px solid var(--border-color);
         text-align: left;
-        font-size: 14px;
-
     }
 
     .invoice-table th {
         background-color: var(--background-color);
+        color: var(--color);
         font-weight: bold;
-        color: var(--color)
+    }
+
+    .invoice-table tbody tr:nth-child(even) {
+        background-color: #f7f7f7;
     }
 
     .invoice-summary {
-        float: right;
-    }
-
-    .summary-table {
-        border-collapse: collapse;
         margin-top: 20px;
-    }
-
-    .summary-table th {
-        background-color: var(--background-color);
-        font-weight: bold;
-        border: 1px solid #ccc;
-        padding-left: 10px;
-        padding-right: 10px;
-        color: var(--color)
-    }
-
-    .summary-table td {
-        padding: 8px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        width: 182px;
-    }
-
-    .summary-table th,
-    .summary-table td {
-        text-align: left;
+        text-align: right;
     }
 
     footer {
-        width: 100%;
-        margin-top: 50px;
-        color: #b8b6b6;
-        border-top: 1px solid #aaa;
+        text-align: center;
+        margin-top: 40px;
+        color: #777;
         padding: 20px 0;
+        font-size: 12px;
+        border-top: 1px solid #ddd;
     }
 
     footer p {
+        border-left: 5px solid var(--highlight-color);
+        padding-left: 15px;
         display: inline-block;
-        border-left: 20px solid #0e9bed;
-        padding-left: 20px;
-    }
-
-
-    @media print {
-        footer {
-            position: absolute;
-            bottom: 10px;
-            page-break-after: always;
-        }
     }
 </style>
 

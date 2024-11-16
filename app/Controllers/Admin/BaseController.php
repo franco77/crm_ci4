@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use IonAuth\Libraries\IonAuth;
 
 /**
  * Class BaseController
@@ -59,6 +60,7 @@ abstract class BaseController extends Controller
         $this->validation = \Config\Services::validation();
         $this->db = \Config\Database::connect();
         $this->email = \Config\Services::email();
+        $this->ionAuth = new IonAuth();
 
         // Cargar configuración de email desde el archivo .env
         $this->emailConfig = [

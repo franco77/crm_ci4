@@ -173,10 +173,8 @@ class Products extends BaseController
 
    public function list()
    {
-
-
       // Obtener productos paginados
-      $products = $this->ProductsModel->paginate(20);  // 12 productos por página
+      $products = $this->ProductsModel->paginate(20);  // 20 productos por página
       $pager = $this->ProductsModel->pager;
 
       // Obtener categorías
@@ -184,17 +182,39 @@ class Products extends BaseController
          ->groupBy('productLine')
          ->findAll();
 
-      // Crear rangos de precios (esto es un ejemplo, ajusta según tus necesidades)
-      $priceRanges = [
-         ['id' => 1, 'min' => 5, 'max' => 15],
-         ['id' => 2, 'min' => 16, 'max' => 26],
-         ['id' => 3, 'min' => 1300, 'max' => 999999]
-      ];
+      // Obtener el precio mínimo y máximo de los productos en la base de datos
+      $minPrice = $this->ProductsModel->selectMin('buyPrice')->first()['buyPrice'];
+      $maxPrice = $this->ProductsModel->selectMax('buyPrice')->first()['buyPrice'];
 
-      foreach ($priceRanges as &$range) {
-         $range['count'] = $this->ProductsModel->where('buyPrice >=', $range['min'])
-            ->where('buyPrice <=', $range['max'])
+      // Definir la cantidad de rangos deseados
+      $numRanges = 5;
+
+      // Calcular el tamaño de cada rango
+      $rangeSize = ($maxPrice - $minPrice) / $numRanges;
+
+      // Generar dinámicamente los rangos de precios
+      $priceRanges = [];
+      for ($i = 0; $i < $numRanges; $i++) {
+         $rangeMin = $minPrice + ($i * $rangeSize);
+         $rangeMax = $rangeMin + $rangeSize;
+
+         // Ajuste para el último rango para que incluya el máximo precio
+         if ($i == $numRanges - 1) {
+            $rangeMax = $maxPrice;
+         }
+
+         // Contar productos dentro del rango actual
+         $count = $this->ProductsModel
+            ->where('buyPrice >=', $rangeMin)
+            ->where('buyPrice <=', $rangeMax)
             ->countAllResults();
+
+         $priceRanges[] = [
+            'id' => $i + 1,
+            'min' => $rangeMin,
+            'max' => $rangeMax,
+            'count' => $count
+         ];
       }
 
       return view('admin/products/index', [
@@ -202,10 +222,10 @@ class Products extends BaseController
          'pager' => $pager,
          'products' => $products,
          'categories' => $categories,
-         'priceRanges' => $priceRanges,
-         'pager' => $this->ProductsModel->pager
+         'priceRanges' => $priceRanges
       ]);
    }
+
 
    public function show($id = null)
    {

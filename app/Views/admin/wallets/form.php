@@ -3,10 +3,10 @@
         <label for="user_id" class="form-label">Cliente</label>
         <select name="user_id" class="select2" id="clientSelect">
             <?php foreach ($data_customer as $customer): ?>
-            <option value="<?= esc($customer->id) ?>"
-                <?= !empty($data_wallets['user_id']) && $data_wallets['user_id'] == $customer->id ? 'selected' : '' ?>>
-                <?= esc($customer->first_name) . ' ' . esc($customer->last_name) ?>
-            </option>
+                <option value="<?= esc($customer->id) ?>"
+                    <?= !empty($data_wallets['user_id']) && $data_wallets['user_id'] == $customer->id ? 'selected' : '' ?>>
+                    <?= esc($customer->first_name) . ' ' . esc($customer->last_name) ?>
+                </option>
             <?php endforeach ?>
         </select>
     </div>
@@ -30,7 +30,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="mb-3">
         <label for="deposit_date" class="form-label">Fecha de depósito</label>

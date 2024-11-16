@@ -6,8 +6,8 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->setAutoRoute(true);
-$routes->get('/', 'Auth::index');
-
+//$routes->get('/', 'Auth::index');
+$routes->get('/', 'Admin\Dashboard::index');
 $routes->group('customers', ['filter' => 'auth'], function ($routes) {
     $routes->get('dashboard', 'Customers\Dashboard::index');
     $routes->get('dashboard/editProfile', 'Customers\Dashboard::editProfile');

@@ -1,5 +1,80 @@
 <?php
 
+use CodeIgniter\I18n\Time;
+
+if (!function_exists('timeAgo')) {
+	/**
+	 * Convierte una fecha en formato "hace tiempo" (e.g., "2 días atrás").
+	 *
+	 * @param string $datetime Fecha en formato compatible con DateTime.
+	 * @return string Fecha humanizada.
+	 */
+	function timeAgo($datetime)
+	{
+		$time = Time::parse($datetime);
+		return $time->humanize();
+	}
+}
+
+if (!function_exists('character_limiter')) {
+	/**
+	 * Limita el número de caracteres de un texto, añadiendo "..." al final si es necesario.
+	 *
+	 * @param string $str Texto a truncar.
+	 * @param int $n Número máximo de caracteres permitidos.
+	 * @return string Texto truncado con "..." si excede el límite.
+	 */
+	function character_limiter($str, $n = 500)
+	{
+		if (strlen($str) < $n) {
+			return $str;
+		}
+
+		// Reemplazar saltos de línea y espacios repetidos
+		$str = preg_replace("/\s+/", ' ', str_replace(["\r\n", "\r", "\n"], ' ', $str));
+
+		if (strlen($str) <= $n) {
+			return $str;
+		}
+
+		$out = "";
+		foreach (explode(' ', trim($str)) as $val) {
+			$out .= $val . ' ';
+			if (strlen($out) >= $n) {
+				break;
+			}
+		}
+
+		return trim($out) . '...';
+	}
+}
+
+if (!function_exists('isAdmin')) {
+	function isAdmin()
+	{
+		$ionAuth = service('IonAuth');
+		return $ionAuth->isAdmin();
+	}
+}
+
+if (!function_exists('getPriorityBadgeClass')) {
+	/**
+	 * Devuelve la clase de Bootstrap según la prioridad.
+	 *
+	 * @param string $priority
+	 * @return string
+	 */
+	function getPriorityBadgeClass(string $priority): string
+	{
+		$classes = [
+			'high' => 'danger',
+			'medium' => 'warning',
+			'low' => 'success',
+		];
+
+		return $classes[$priority] ?? 'secondary';
+	}
+}
 
 /**
  * Function to create custom url
@@ -227,6 +302,9 @@ if (!function_exists('timestampToDate')) {
 		return $date->format('r');
 	}
 }
+
+
+
 
 
 /**

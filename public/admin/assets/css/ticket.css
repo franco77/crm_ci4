@@ -1,0 +1,259 @@
+/* Estilos generales */
+.ticket-stats {
+  transition: transform 0.2s;
+}
+
+.ticket-stats:hover {
+  transform: translateY(-5px);
+}
+
+/* Estilos para los tickets */
+
+.ticket-card.priority-high {
+  border-left-color: #dc3545;
+}
+
+.ticket-card.priority-medium {
+  border-left-color: #ffc107;
+}
+
+.ticket-card.priority-low {
+  border-left-color: #28a745;
+}
+
+/* Indicadores de estado */
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.status-open {
+  background-color: #007bff;
+}
+
+.status-in_progress {
+  background-color: #ffc107;
+}
+
+.status-resolved {
+  background-color: #28a745;
+}
+
+.status-closed {
+  background-color: #6c757d;
+}
+
+/* Timeline de actividad */
+.activity-timeline {
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-item:before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background-color: #e9ecef;
+}
+
+.timeline-item:after {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #007bff;
+}
+
+/* Estilos para adjuntos */
+.attachment-item {
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+/* Estilos para las respuestas */
+.reply-item {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #007bff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ticket-stats {
+    margin-bottom: 1rem;
+  }
+
+  .search-container .row > div {
+    margin-bottom: 1rem;
+  }
+}
+
+.ticket-stats {
+  transition: transform 0.2s;
+}
+
+.ticket-stats:hover {
+  transform: translateY(-5px);
+}
+
+.priority-high {
+  border-left: 4px solid #dc3545;
+}
+
+.priority-medium {
+  border-left: 4px solid #ffc107;
+}
+
+.priority-low {
+  border-left: 4px solid #198754;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.status-open {
+  background-color: #ffc107;
+}
+
+.status-in-progress {
+  background-color: #0dcaf0;
+}
+
+.status-resolved {
+  background-color: #198754;
+}
+
+.status-closed {
+  background-color: #6c757d;
+}
+
+.ticket-card {
+  transition: box-shadow 0.3s;
+}
+
+.ticket-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.search-container {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.activity-timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.activity-timeline::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #dee2e6;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -23px;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #0d6efd;
+}
+
+.ticket-card {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.ticket-card.fade-out {
+  opacity: 0;
+}
+
+.ticket-card.fade-in {
+  opacity: 1;
+}
+
+.modal-content {
+  border-radius: 1rem;
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.hover-shadow {
+  transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.reply-message {
+  line-height: 1.6;
+}
+
+.badge {
+  padding: 0.5em 1em;
+  font-weight: 500;
+}
+
+.transition {
+  transition: all 0.3s ease;
+}
+
+/* Asegurarse que el modal se vea bien en móviles */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .modal-content {
+    border-radius: 0.5rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+}

@@ -121,6 +121,10 @@
                                 Productos</a>
                         </li>
                         <li class="slide">
+                            <a href="<?= base_url('admin/wishlist/') ?>" class="side-menu__item">Lista De
+                                De Deseos</a>
+                        </li>
+                        <li class="slide">
                             <a href="<?= base_url('admin/invoices') ?>" class="side-menu__item">Facturas</a>
                         </li>
                         <li class="slide">
