@@ -124,7 +124,7 @@
                                 <span class="input-group-text">
                                     <i class="bi bi-file-earmark-text"></i>
                                 </span>
-                                <input type="number" id="invoice_id" class="form-control form-control-lg"
+                                <input type="number" id="invoice_id" class="form-control"
                                     placeholder="Ingrese el número de factura" required min="1">
                                 <div class="invalid-feedback">
                                     Por favor ingrese un número de factura válido
@@ -139,8 +139,8 @@
                             </label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text">$</span>
-                                <input type="number" id="amount" class="form-control form-control-lg" step="0.01"
-                                    placeholder="0.00" required min="0.01">
+                                <input type="number" id="amount" class="form-control" step="0.01" placeholder="0.00"
+                                    required min="0.01">
                                 <div class="invalid-feedback">
                                     Por favor ingrese un monto válido
                                 </div>
@@ -227,7 +227,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section("js") ?>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize tooltips
@@ -390,6 +390,43 @@
             });
         });
 
+
+
+        // Función para actualizar la visualización del wallet después de un pago
+        function updateWalletInfo(walletData) {
+            // Actualizar el select del wallet
+            const formattedAmount = formatNumber(walletData.remaining_amount);
+            $(`#wallet_select option[value="${walletData.id}"]`).text(
+                `Wallet #${walletData.id} - $${formattedAmount} disponible`
+            );
+
+            // Actualizar los detalles del wallet
+            $('#total_amount').text(`$${formatNumber(walletData.amount)}`);
+            $('#available_amount').text(`$${formatNumber(walletData.remaining_amount)}`);
+
+            // Actualizar los datos del option seleccionado
+            const $selectedOption = $('#wallet_select option:selected');
+            $selectedOption.data('remaining', walletData.remaining_amount);
+            $selectedOption.data('amount', walletData.amount);
+        }
+
+        // Función mejorada para actualizar la información de la factura
+        function updateInvoiceInfo(invoice) {
+            $('#invoice_total').text(`$${formatNumber(invoice.invoice_total)}`);
+            $('#invoice_paid').text(`$${formatNumber(invoice.amount_paid)}`);
+            $('#invoice_due').text(`$${formatNumber(invoice.amount_due)}`);
+
+            // Actualizar el máximo permitido para el monto a pagar
+            $('#amount').attr('max', invoice.amount_due);
+
+            // Mostrar/ocultar sección de detalles
+            $('#invoice_details').removeClass('d-none');
+        }
+
+
+
+
+        // Función principal de procesamiento de pago mejorada
         function procesarPago(walletId, invoiceId, amount) {
             showLoading('Procesando pago...');
 
@@ -405,24 +442,47 @@
                     Swal.close();
 
                     if (response.success) {
-                        // Actualizar la interfaz con los nuevos valores
-                        updateWalletDisplay(response.wallet_balance);
-                        updateInvoiceDisplay(response.invoice);
+                        // Actualizar inmediatamente los displays con los nuevos valores
+                        updateWalletInfo({
+                            id: walletId,
+                            amount: response.wallet.amount,
+                            remaining_amount: response.wallet.remaining_amount
+                        });
 
-                        showSuccess('Pago Procesado Exitosamente', `
-                    <div class="text-start">
-                        <p><strong>Monto pagado:</strong> $${formatNumber(amount)}</p>
-                        <p><strong>Nuevo saldo en wallet:</strong> $${formatNumber(response.wallet_balance)}</p>
-                        <p><strong>Saldo pendiente factura:</strong> $${formatNumber(response.invoice.amount_due)}</p>
-                    </div>
-                `);
+                        updateInvoiceInfo({
+                            invoice_total: response.invoice.invoice_total,
+                            amount_paid: response.invoice.amount_paid,
+                            amount_due: response.invoice.amount_due
+                        });
 
-                        // Limpiar formulario
-                        $('#payment_form')[0].reset();
+                        // Mostrar mensaje de éxito con SweetAlert2
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Pago Procesado Exitosamente!',
+                            html: `
+                        <div class="text-start">
+                            <p><strong>Monto pagado:</strong> $${formatNumber(amount)}</p>
+                            <p><strong>Nuevo saldo en wallet:</strong> $${formatNumber(response.wallet.remaining_amount)}</p>
+                            <p><strong>Saldo pendiente factura:</strong> $${formatNumber(response.invoice.amount_due)}</p>
+                        </div>
+                    `,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Limpiar formulario después de cerrar el mensaje
+                                resetForm();
 
-                        // Recargar los datos del wallet
-                        const userId = $('#user_select').val();
-                        refreshWalletData(userId, walletId);
+                                // Si la factura está pagada completamente
+                                if (response.invoice.amount_due <= 0) {
+                                    showBootstrapAlert('Factura pagada completamente',
+                                        'success');
+                                }
+                            }
+                        });
+
+                        // Recargar datos frescos del wallet
+                        refreshWalletData(walletId);
                     } else {
                         showError(response.message || 'Error al procesar el pago');
                     }
@@ -435,10 +495,114 @@
         }
 
 
+
+
+        // Función para actualizar todas las visualizaciones
+        function updateAllDisplays(response) {
+            // Actualizar montos del wallet
+            updateWalletAmounts(response.wallet_balance);
+
+            // Actualizar detalles de la factura
+            updateInvoiceDetails(response.invoice);
+
+            // Actualizar el select de wallet con el nuevo balance
+            updateWalletSelectOption(response.wallet_balance);
+        }
+
+        // Actualizar montos del wallet
+        function updateWalletAmounts(newBalance) {
+            const formattedBalance = formatNumber(newBalance);
+
+            // Actualizar montos en la sección de detalles del wallet
+            $('#total_amount').text(`$${formattedBalance}`);
+            $('#available_amount').text(`$${formattedBalance}`);
+        }
+
+
+        // Actualizar detalles de la factura
+        function updateInvoiceDetails(invoice) {
+            if (!invoice) return;
+
+            $('#invoice_total').text(`$${formatNumber(invoice.invoice_total)}`);
+            $('#invoice_paid').text(`$${formatNumber(invoice.amount_paid)}`);
+            $('#invoice_due').text(`$${formatNumber(invoice.amount_due)}`);
+
+            // Actualizar el máximo permitido para el input de monto
+            $('#amount').attr('max', invoice.amount_due);
+        }
+
+
+        // Actualizar la opción seleccionada en el select de wallet
+        function updateWalletSelectOption(newBalance) {
+            const $selectedOption = $('#wallet_select option:selected');
+            const walletId = $selectedOption.val();
+
+            if ($selectedOption.length) {
+                // Actualizar el texto y los datos de la opción
+                $selectedOption.text(`Wallet #${walletId} - $${formatNumber(newBalance)} disponible`);
+                $selectedOption.data('remaining', newBalance);
+            }
+        }
+
+
         function updateInvoiceDisplay(invoice) {
             $('#invoice_total').text(`$${formatNumber(invoice.invoice_total)}`);
             $('#invoice_paid').text(`$${formatNumber(invoice.amount_paid)}`);
             $('#invoice_due').text(`$${formatNumber(invoice.amount_due)}`);
+        }
+
+
+
+        // Resetear formulario y estados
+        function resetFormAndStates() {
+            $('#payment_form')[0].reset();
+            $('#amount_warning').addClass('d-none');
+            validateForm();
+        }
+
+
+
+        // Recargar datos después del pago
+        function reloadDataAfterPayment(walletId) {
+            const userId = $('#user_select').val();
+
+            // Primero actualizamos los datos del wallet
+            $.ajax({
+                url: '<?= base_url('admin/wallets/getUserWallets') ?>',
+                method: 'GET',
+                data: {
+                    user_id: userId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Encontrar el wallet actualizado
+                        const updatedWallet = response.wallets.find(w => w.id == walletId);
+                        if (updatedWallet) {
+                            // Actualizar la información mostrada
+                            updateWalletInfoDisplay(updatedWallet);
+
+                            // Actualizar las opciones del select
+                            const $walletSelect = $('#wallet_select');
+                            $walletSelect.html('<option value="">Seleccione un wallet</option>');
+
+                            response.wallets.forEach(wallet => {
+                                const isSelected = wallet.id == walletId;
+                                $walletSelect.append(`
+                            <option value="${wallet.id}" 
+                                data-amount="${wallet.amount}"
+                                data-remaining="${wallet.remaining_amount}"
+                                data-date="${wallet.deposit_date}"
+                                data-payment-method="${wallet.payment_method}"
+                                data-reference="${wallet.reference}"
+                                ${isSelected ? 'selected' : ''}>
+                                Wallet #${wallet.id} - $${formatNumber(wallet.remaining_amount)} disponible
+                            </option>
+                        `);
+                            });
+                        }
+                    }
+                }
+            });
         }
 
 
@@ -548,12 +712,13 @@
 
 
 
-        // Función auxiliar para formatear números
+        // Función auxiliar para formatear números mejorada
         function formatNumber(number) {
             if (number === undefined || number === null) return '0.00';
             return parseFloat(number).toLocaleString('es-CO', {
                 minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+                maximumFractionDigits: 2,
+                useGrouping: true
             });
         }
 
@@ -582,6 +747,9 @@
             $('#total_amount').text(`$${formattedBalance}`);
             $('#available_amount').text(`$${formattedBalance}`);
         }
+
+
+
 
         function validateForm() {
             const walletId = $('#wallet_select').val();

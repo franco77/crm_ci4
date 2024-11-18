@@ -75,8 +75,6 @@ class Wallets extends BaseController
    {
       $userId = $this->request->getGet('user_id');
       $wallets = $this->WalletsModel->getUserWallets($userId);
-
-
       return $this->response->setJSON([
          'success' => true,
          'wallets' => $wallets
